@@ -143,9 +143,6 @@ class Lifter(object):
         Downloader(logger=self.logger, download_url=download_url, backup_url=source_url, hidden_url=hidden_url,output=output, header=self.header, user_agent=self.user_agent,
                    show_info=show_info, settings=self.settings, quiet=self.quiet)
 
-    def test(self, i, ii):
-        print(i, ii)
-
     def download_show(self, url):
         page = self.request_c(url)
         soup = BeautifulSoup(page.content, 'html.parser')
