@@ -5,7 +5,7 @@ except ImportError:
 from Settings import Settings
 import os
 
-class SaveDownloadToFile: 
+class DownloadsDatabase: 
     def __init__(self, settings: Settings):
         self.shows = {}
         self.database_path = settings.get_setting('downloadsDatabaseLocation')

@@ -8,7 +8,7 @@ import requests
 from Lifter import Lifter
 from version import __version__
 from Settings import Settings
-from SaveDownloads import SaveDownloadToFile
+from DownloadsDatabase import DownloadsDatabase
 
 class Main:
     def arguments():
@@ -56,7 +56,7 @@ class Main:
 
     if __name__ == '__main__':
         settings = Settings()
-        database = SaveDownloadToFile(settings)
+        database = DownloadsDatabase(settings)
 
         if settings.get_setting('checkForUpdates'):
             check_for_new_version()
