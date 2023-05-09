@@ -47,15 +47,20 @@ class Main:
         return parser.parse_args()
 
 
+    @staticmethod
+    def check_for_new_version():
+        latest_version = requests.get('https://raw.githubusercontent.com/EpicUnknown/wco-dl/master/version.py').text.split("'")[1]
+        if (__version__ < latest_version):
+            print('Newer version available, on https://github.com/EpicUnknown/wco-dl', end='\n\n')
+
+
     if __name__ == '__main__':
         # Run the settings script
         settings = Settings()
         database = SaveDownloadToFile(settings)
         
         if settings.get_setting('checkForUpdates'):
-            latest_version = requests.get('https://raw.githubusercontent.com/EpicUnknown/wco-dl/master/version.py').text.split("'")[1]
-            if (__version__ < latest_version):
-                print('Newer version available, on https://github.com/EpicUnknown/wco-dl', end='\n\n')
+            check_for_new_version()
 
         args = arguments()
         
