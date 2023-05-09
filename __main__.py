@@ -94,7 +94,7 @@ class Main:
 
         if args.update_shows:
             print("Updating all shows, this will take a while.")
-            for url in database.return_show_url():
+            for url in database.iterate_urls():
                 Lifter(
                     url=url,
                     resolution=args.highdef,
@@ -113,7 +113,7 @@ class Main:
             exit()
 
         if args.show_downloaded_animes:
-            database.show_all_url()
+            database.print_shows()
             exit()
 
         if args.verbose:

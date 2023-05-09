@@ -55,7 +55,7 @@ class Lifter(object):
 
         if valid_link:
             # Check to see if we are downloading a single episode or multiple
-            self.database.add_new_anime_to_database(self.url)
+            self.database.add_show_to_database(self.url)
             if extra[0] == "anime/":
                 # We are downloading multiple episodes
                 print("Downloading show")
