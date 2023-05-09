@@ -238,7 +238,7 @@ class Lifter(object):
                             processes_extra.append(extra)
                             count += 1
                         except Exception as e:
-                            if self.logger == 'True':
+                            if self.logger:
                                 print('Error: {0}'.format(e))
                             pass
                     for x in processes:

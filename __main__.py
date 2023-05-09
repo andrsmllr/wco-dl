@@ -5,7 +5,7 @@ import argparse
 import logging
 import platform
 import requests
-from Lifter import *
+from Lifter import Lifter
 from version import __version__
 from Settings import Settings
 from SaveDownloads import SaveDownloadToFile
@@ -43,7 +43,7 @@ class Main:
                             help="Will not show download progress")
         parser.add_argument('--version', action='store_true',
                             help='Shows version and exits.')
-        
+
         return parser.parse_args()
 
 
@@ -55,43 +55,64 @@ class Main:
 
 
     if __name__ == '__main__':
-        # Run the settings script
         settings = Settings()
         database = SaveDownloadToFile(settings)
-        
+
         if settings.get_setting('checkForUpdates'):
             check_for_new_version()
 
         args = arguments()
-        
-        logger = "False"
-        quiet = 'False'
 
-        if args.quiet:
-            quiet = 'True'
+        logger = args.verbose or False
+        quiet = args.quiet or False
 
         if args.batch:
             if type(args.threads) == list:
                 args.threads = args.threads[0]
+
             with open(args.batch[0], 'r') as anime_list:
                 for anime in anime_list:
-                    print(anime.replace('\n', ''))
-                    Lifter(url=anime.replace('\n', '').replace('https://wcostream.net', 'https://www.wcostream.net'), resolution=args.highdef, logger=logger, season=args.season,
-                    ep_range=args.episoderange, exclude=args.exclude, output=args.output, newest=args.newest,
-                    settings=settings, database=database, threads=args.threads, quiet=quiet)
+                    anime = anime.strip(" \n")
+                    anime = anime.replace('https://wcostream.net', 'https://www.wcostream.net')
+                    Lifter(
+                        url=anime,
+                        resolution=args.highdef,
+                        logger=logger,
+                        season=args.season,
+                        ep_range=args.episoderange,
+                        exclude=args.exclude,
+                        output=args.output,
+                        newest=args.newest,
+                        settings=settings,
+                        database=database,
+                        threads=args.threads,
+                        quiet=quiet
+                    )
+
             print('Done')
             exit()
 
-        if args.update_shows: 
+        if args.update_shows:
             print("Updating all shows, this will take a while.")
-            for x in database.return_show_url():
-                Lifter(url=x, resolution=args.highdef, logger=logger, season=args.season,
-                ep_range=args.episoderange, exclude=args.exclude, output=args.output, newest=args.newest,
-                settings=settings, database=database, update=True, quiet=quiet)
+            for url in database.return_show_url():
+                Lifter(
+                    url=url,
+                    resolution=args.highdef,
+                    logger=logger,
+                    season=args.season,
+                    ep_range=args.episoderange,
+                    exclude=args.exclude,
+                    output=args.output,
+                    newest=args.newest,
+                    settings=settings,
+                    database=database,
+                    update=True,
+                    quiet=quiet
+                )
             print('Done')
             exit()
 
-        if args.show_downloaded_animes: 
+        if args.show_downloaded_animes:
             database.show_all_url()
             exit()
 
@@ -102,7 +123,7 @@ class Main:
             logging.debug(
                 "Operating System : {0} - {1} - {2}".format(platform.system(), platform.release(), platform.version()))
             logging.debug("Python Version : {0} ({1})".format(platform.python_version(), platform.architecture()[0]))
-            logger = "True"
+            logger = True
 
         if args.version:
             print("Current Version : {0}".format(__version__))
@@ -112,39 +133,36 @@ class Main:
             args.highdef = '720'
         else:
             args.highdef = '480'
-        
+
         if args.input is None:
             print("Please enter the required argument. Run __main__.py --help")
             exit()
-        else:
-            if type(args.episoderange) == list:
-                if '-' in args.episoderange[0]:
-                    args.episoderange = args.episoderange[0].split('-')
-                else:
-                    args.episoderange = args.episoderange[0]
-            if type(args.season) == list:
-                args.season = args.season[0]
-            if type(args.output) == list:
-                args.output = args.output[0]
-            if type(args.exclude) == list:
-                if ',' in args.exclude[0]:
-                    args.exclude = args.exclude[0].split(',')
-                else:
-                    args.exclude = args.exclude[0]
-            if type(args.threads) ==list:
-                args.threads = args.threads[0]
 
-            Lifter(
-                url=args.input[0].replace('https://wcostream.net', 'https://www.wcostream.net'),
-                resolution=args.highdef,
-                logger=logger,
-                season=args.season,
-                ep_range=args.episoderange,
-                exclude=args.exclude,
-                output=args.output,
-                newest=args.newest,
-                settings=settings,
-                database=database,
-                threads=args.threads,
-                quiet=quiet,
-            )
+        if type(args.episoderange) == list:
+            if '-' in args.episoderange[0]:
+                args.episoderange = args.episoderange[0].split('-')
+            else:
+                args.episoderange = args.episoderange[0]
+        if type(args.season) == list:
+            args.season = args.season[0]
+        if type(args.output) == list:
+            args.output = args.output[0]
+        if type(args.exclude) == list:
+            args.exclude = args.exclude[0].split(',')
+        if type(args.threads) ==list:
+            args.threads = args.threads[0]
+
+        Lifter(
+            url=args.input[0].replace('https://wcostream.net', 'https://www.wcostream.net'),
+            resolution=args.highdef,
+            logger=logger,
+            season=args.season,
+            ep_range=args.episoderange,
+            exclude=args.exclude,
+            output=args.output,
+            newest=args.newest,
+            settings=settings,
+            database=database,
+            threads=args.threads,
+            quiet=quiet
+        )

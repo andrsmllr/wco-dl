@@ -86,7 +86,7 @@ class Downloader(object):
                 dlr = self.sess.get(host_url, stream=True, headers=resume_header)
                 try:
                     with open(self.file_path, 'ab') as handle:
-                        if (self.quiet == 'False'):
+                        if (not self.quiet):
                             with tqdm(unit_scale=1024, miniters=1, desc='Downloading', initial=int(resume_bytes), total=int(dlr.headers['content-length'], 0)) as pbar:
                                 for data in dlr.iter_content(chunk_size=1024):
                                     handle.write(data)
@@ -95,7 +95,7 @@ class Downloader(object):
                             for data in dlr.iter_content(chunk_size=1024):
                                 handle.write(data)
                 except Exception as e:
-                    if (self.logger == 'True'):
+                    if self.logger:
                         print('Error: {}'.format(e), end='\n\n')
                     return
                 return
@@ -103,7 +103,7 @@ class Downloader(object):
                 dlr = self.sess.get(url, stream=True, headers=self.header)  # Downloading the content using python.
                 try: 
                     with open(self.file_path, "wb") as handle:
-                        if (self.quiet == 'False'):
+                        if (not self.quiet):
                             with tqdm(unit='B', unit_scale=True, unit_divisor=1024, miniters=1, desc="Downloading", total=int(dlr.headers['content-length'], 0)) as pbar:
                                 for data in dlr.iter_content(chunk_size=1024):
                                     handle.write(data)
@@ -112,7 +112,7 @@ class Downloader(object):
                             for data in dlr.iter_content(chunk_size=1024):
                                 handle.write(data)
                 except Exception as e:
-                    if (self.logger == 'True'):
+                    if self.logger:
                         print('Error: {}'.format(e), end='\n\n')
                     return False
 
