@@ -11,6 +11,42 @@ from Settings import Settings
 from SaveDownloads import SaveDownloadToFile
 
 class Main:
+    def arguments():
+        parser = argparse.ArgumentParser(description='wco-dl downloads shows from wcostream.net')
+
+        required_args = parser.add_argument_group('Required Arguments :')
+        required_args.add_argument('-i', '--input', nargs=1, help='Inputs the URL to show.')
+
+        parser.add_argument('-hd', '--highdef',
+                            help='If you wish to get 720p', action="store_true")
+        parser.add_argument('-epr', '--episoderange', nargs=1, default='All',
+                            help='Specifies the range of episodes to download.')
+        parser.add_argument('-se', '--season', nargs=1, default='All',
+                            help='Specifies the season to download.')
+        parser.add_argument('-x', '--exclude', nargs=1, default=None,
+                            help='Specifies the episodes to not download (ie ova).')
+        parser.add_argument('-o', '--output', nargs=1,
+                            help='Specifies the directory of which to save the files.')
+        parser.add_argument('-v', "--verbose", action="store_true",
+                            help="Prints important debugging messages on screen.")
+        parser.add_argument('-n', '--newest', action='store_true',
+                            help='Get the newest episode in the series.')
+        parser.add_argument('-sh', '--show_downloaded_animes', action='store_true',
+                            help='This will show all downloaded shows and episodes')
+        parser.add_argument('-us', '--update_shows', action='store_true',
+                            help='This will update all shows in your database that have new episodes.')
+        parser.add_argument('-b', '--batch', nargs=1,
+                            help='Batch download, download multiple anime.')
+        parser.add_argument('-t', '--threads', nargs=1, default=None,
+                            help='This will create multiple threads, in other words download multiple episodes at ones.')
+        parser.add_argument('-q', "--quiet", action="store_true",
+                            help="Will not show download progress")
+        parser.add_argument('--version', action='store_true',
+                            help='Shows version and exits.')
+        
+        return parser.parse_args()
+
+
     if __name__ == '__main__':
         # Run the settings script
         settings = Settings()
@@ -21,33 +57,10 @@ class Main:
             if (__version__ < latest_version):
                 print('Newer version available, on https://github.com/EpicUnknown/wco-dl', end='\n\n')
 
-        parser = argparse.ArgumentParser(description='wco-dl downloads shows from wcostream.net')
-
-        parser.add_argument('--version', action='store_true', help='Shows version and exits.')
-
-        required_args = parser.add_argument_group('Required Arguments :')
-        required_args.add_argument('-i', '--input', nargs=1, help='Inputs the URL to show.')
-        parser.add_argument('-hd', '--highdef', help='If you wish to get 720p', action="store_true")
-        parser.add_argument('-epr', '--episoderange', nargs=1, help='Specifies the range of episodes to download.',
-                            default='All')
-        parser.add_argument('-se', '--season', nargs=1, help='Specifies the season to download.',
-                            default='All')
-        parser.add_argument('-x', '--exclude', nargs=1, help='Specifies the episodes to not download (ie ova).',
-                            default=None)
-        parser.add_argument('-o', '--output', nargs=1, help='Specifies the directory of which to save the files.')
-        parser.add_argument("-v", "--verbose", help="Prints important debugging messages on screen.",
-                            action="store_true")
-        parser.add_argument('-n', '--newest', help='Get the newest episode in the series.', action='store_true')
-        parser.add_argument('-sh', '--show_downloaded_animes', help='This will show all downloaded shows and episodes', action='store_true')
-        parser.add_argument('-us', '--update_shows', help='This will update all shows in your database that have new episodes.', action='store_true')
-        parser.add_argument('-b', '--batch', help='Batch download, download multiple anime.', nargs=1)
-        parser.add_argument('-t', '--threads', help='This will create multiple threads, in other words download multiple episodes at ones.', nargs=1, default=None)
-        parser.add_argument("-q", "--quiet", help="Will not show download progress",
-                            action="store_true")
+        args = arguments()
+        
         logger = "False"
         quiet = 'False'
-        
-        args = parser.parse_args()
 
         if args.quiet:
             quiet = 'True'
@@ -116,6 +129,17 @@ class Main:
             if type(args.threads) ==list:
                 args.threads = args.threads[0]
 
-            Lifter(url=args.input[0].replace('https://wcostream.net', 'https://www.wcostream.net'), resolution=args.highdef, logger=logger, season=args.season,
-                   ep_range=args.episoderange, exclude=args.exclude, output=args.output, newest=args.newest,
-                   settings=settings, database=database, threads=args.threads, quiet=quiet)
+            Lifter(
+                url=args.input[0].replace('https://wcostream.net', 'https://www.wcostream.net'),
+                resolution=args.highdef,
+                logger=logger,
+                season=args.season,
+                ep_range=args.episoderange,
+                exclude=args.exclude,
+                output=args.output,
+                newest=args.newest,
+                settings=settings,
+                database=database,
+                threads=args.threads,
+                quiet=quiet,
+            )
