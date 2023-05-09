@@ -30,7 +30,7 @@ class Lifter(object):
         self.threads = threads
         self.original_thread = self.threads
         self.quiet = quiet
-        
+
         if output is None:
             self.output = ""
         else:
@@ -133,12 +133,22 @@ class Lifter(object):
             try:
                 download_url = source_url[1][1]
             except Exception:
-                download_url = download_url[0][1] 
+                download_url = download_url[0][1]
         show_info = self.info_extractor(extra)
         output = self.check_output(show_info[0])
 
-        Downloader(logger=self.logger, download_url=download_url, backup_url=source_url, hidden_url=hidden_url,output=output, header=self.header, user_agent=self.user_agent,
-                   show_info=show_info, settings=self.settings, quiet=self.quiet)
+        Downloader(
+            logger=self.logger,
+            download_url=download_url,
+            backup_url=source_url,
+            hidden_url=hidden_url,
+            output=output,
+            header=self.header,
+            user_agent=self.user_agent,
+            show_info=show_info,
+            settings=self.settings,
+            quiet=self.quiet
+        ).start_download()
 
     def download_show(self, url):
         page = self.request_c(url)
@@ -148,7 +158,7 @@ class Lifter(object):
         for link in soup.findAll('a', {'class': 'sonra'}):
             if link['href'] not in links:
                 links.append(link['href'])
-    
+
         if self.exclude is not None:
             excluded = [i for e in self.exclude for i in links if re.search(e, i)]
             links = [item for item in links if item not in excluded]
@@ -204,12 +214,22 @@ class Lifter(object):
                         try:
                             download_url = source_url[1][1]
                         except Exception:
-                            download_url = source_url[0][1] 
+                            download_url = source_url[0][1]
                     show_info = self.info_extractor(item)
                     output = self.check_output(show_info[0])
 
-                    Downloader(logger=self.logger, download_url=download_url, backup_url=backup_url, hidden_url=hidden_url ,output=output, header=self.header, user_agent=self.user_agent,
-                            show_info=show_info, settings=self.settings, quiet=self.quiet)
+                    Downloader(
+                        logger=self.logger,
+                        download_url=download_url,
+                        backup_url=backup_url,
+                        hidden_url=hidden_url,
+                        output=output,
+                        header=self.header,
+                        user_agent=self.user_agent,
+                        show_info=show_info,
+                        settings=self.settings,
+                        quiet=self.quiet
+                    ).start_download()
             else:
                 count = 0
                 while (True):
@@ -217,11 +237,11 @@ class Lifter(object):
                     processes = []
                     processes_url = []
                     processes_extra = []
-                    
+
                     if (int(self.threads) > len(matching)):
                         print('To many threads, setting threads to deafult amount.')
                         self.threads = 3
-                    
+
                     procs = ProcessParallel(print('Threads started', end='\n\n'))
                     for x in range(int(self.threads)):
                         try:
@@ -243,7 +263,7 @@ class Lifter(object):
                         self.threads = None
                         self.download_show(url)
                         break
-                        
+
                     procs.fork_processes()
                     procs.start_all()
                     procs.join_all()
@@ -263,13 +283,24 @@ class Lifter(object):
                     try:
                         download_url = source_url[1][1]
                     except Exception:
-                        download_url = source_url[0][1] 
+                        download_url = source_url[0][1]
                 show_info = self.info_extractor(item)
                 output = self.check_output(show_info[0])
 
-                Downloader(logger=self.logger, download_url=download_url, backup_url=backup_url, hidden_url=hidden_url ,output=output, header=self.header, user_agent=self.user_agent,
-                        show_info=show_info, settings=self.settings, quiet=self.quiet)
-            if (self.original_thread != None and self.original_thread != 0): 
+                Downloader(
+                    logger=self.logger,
+                    download_url=download_url,
+                    backup_url=backup_url,
+                    hidden_url=hidden_url,
+                    output=output,
+                    header=self.header,
+                    user_agent=self.user_agent,
+                    show_info=show_info,
+                    settings=self.settings,
+                    quiet=self.quiet
+                ).start_download()
+
+            if (self.original_thread != None and self.original_thread != 0):
                 self.threads = self.original_thread
 
     @staticmethod
