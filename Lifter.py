@@ -1,15 +1,12 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import os
-from platform import mac_ver, machine
 import re
-import sys
 import requests
 import base64
 import urllib3
 from bs4 import BeautifulSoup
-from Downloader import *
+from Downloader import Downloader
 from Process import ProcessParallel
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -67,7 +64,7 @@ class Lifter(object):
         else:
             # Not a valid wcostream link
             print(extra)
-            sys.exit()
+            exit()
 
     def check_output(self, anime_name):
         output_directory = os.path.abspath("Output" + os.sep + str(anime_name) + os.sep)
