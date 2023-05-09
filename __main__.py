@@ -17,8 +17,8 @@ class Main:
         database = SaveDownloadToFile(settings)
         
         if settings.get_setting('checkForUpdates'):
-            r = requests.get('https://raw.githubusercontent.com/EpicUnknown/wco-dl/master/version.py').text.replace('_version__ = ', '').replace("'", '')
-            if (__version__ != r):
+            latest_version = requests.get('https://raw.githubusercontent.com/EpicUnknown/wco-dl/master/version.py').text.split("'")[1]
+            if (__version__ < latest_version):
                 print('Newer version available, on https://github.com/EpicUnknown/wco-dl', end='\n\n')
 
         parser = argparse.ArgumentParser(description='wco-dl downloads shows from wcostream.net')
