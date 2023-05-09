@@ -7,13 +7,15 @@ from requests import session
 from tqdm import tqdm
 
 class Downloader(object):
+    """Object that performs download tasks"""
+
     def __init__(self, logger, download_url, backup_url, hidden_url, output, header, user_agent, show_info, settings, quiet):
         self.settings = settings
         self.sess = session()
         self.sess = create_scraper(self.sess)
         self.show_name = show_info[0]
         self.season = re.search(r'(\d+)', show_info[1]).group(1).zfill(self.settings.get_setting('seasonPadding'))
-        
+
 
         if show_info[2] == "":
             self.episode = '{0}'.format(re.search(r'(\d+)', show_info[3]).group(1).zfill(
@@ -43,6 +45,8 @@ class Downloader(object):
 
 
     def start_download(self):
+        """Start the download"""
+
         file_exists = os.path.exists(self.file_path)
 
         if not self.settings.get_setting('checkIfFileIsAlreadyDownloaded') and file_exists:
@@ -91,6 +95,8 @@ class Downloader(object):
 
 
     def check_if_downloaded(self, url):
+        """Check if a file/url was already downloaded"""
+
         print('[wco-dl] - Checking if video is already downloaded, this may take some time, you can turn this off in your settings.')
         if os.path.exists(self.file_path):
             file_size = int(os.path.getsize(self.file_path))
@@ -107,6 +113,8 @@ class Downloader(object):
 
 
     def _download(self, url, resume_bytes=0):
+        """Private function that performs the actual download task"""
+
         while True:
             file_exists = os.path.exists(self.file_path)
 

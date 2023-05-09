@@ -2,9 +2,10 @@
 
 import os
 import re
-import requests
 import base64
+import requests
 import urllib3
+from urllib3.exceptions import ResponseError
 from bs4 import BeautifulSoup
 from Downloader import Downloader
 from Process import ProcessParallel
@@ -14,6 +15,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # TODO: Make it track missed episodes and retry when done
 
 class Lifter(object):
+    """Object that grabs URLs and initiates downloads"""
 
     def __init__(self, url, resolution, logger, season, ep_range, exclude, output, newest, settings, database, quiet,update=False, threads=None):
         # Define our variables
@@ -314,7 +316,7 @@ class Lifter(object):
                 show_name, episode, desc = re.findall(r'([a-zA-Z0-9].+)\s(episode\s\d+\s?)(.+)', url.replace(
                     '-', ' '))[0]
                 season = "season 1"
-        except:
+        except Exception:
             show_name = url
             season = "Season 1"
             episode = "Episode 0"
@@ -346,7 +348,7 @@ class Lifter(object):
                 }
             )
             if not page2.ok:
-                raise Exception('Sources XMLHttpRequest request failed')
+                raise ResponseError('Sources XMLHttpRequest request failed')
             json_data = page2.json()
 
             # Only two qualities are ever available: 480p ("SD") and 720p ("HD").

@@ -10,6 +10,7 @@ import json
 
 
 class Settings:
+    """Object that holds user settings"""
 
     def __init__(self):
         self.loaded_settings = {}
@@ -39,5 +40,7 @@ class Settings:
             print('Settings have been created!')
 
     def get_setting(self, setting_name):
+        """Get the value for a setting"""
+
         if setting_name in self.loaded_settings:
             return self.loaded_settings[setting_name]

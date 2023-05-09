@@ -11,7 +11,12 @@ from Settings import Settings
 from DownloadsDatabase import DownloadsDatabase
 
 class Main:
+    """Main class of the wco-dl module"""
+
+    @staticmethod
     def arguments():
+        """Function that parses command line arguments"""
+
         parser = argparse.ArgumentParser(description='wco-dl downloads shows from wcostream.net')
 
         required_args = parser.add_argument_group('Required Arguments :')
@@ -49,6 +54,8 @@ class Main:
 
     @staticmethod
     def check_for_new_version():
+        """Check if a new version is available and print message"""
+
         latest_version = requests.get('https://raw.githubusercontent.com/EpicUnknown/wco-dl/master/version.py').text.split("'")[1]
         if (__version__ < latest_version):
             print('Newer version available, on https://github.com/EpicUnknown/wco-dl', end='\n\n')
@@ -67,7 +74,7 @@ class Main:
         quiet = args.quiet or False
 
         if args.batch:
-            if type(args.threads) == list:
+            if isinstance(args.threads, list):
                 args.threads = args.threads[0]
 
             with open(args.batch[0], 'r') as anime_list:
@@ -120,9 +127,10 @@ class Main:
             logging.basicConfig(format='%(levelname)s: %(message)s', filename="Error Log.log", level=logging.DEBUG)
             logging.debug('You have successfully set the Debugging On.')
             logging.debug("Arguments Provided : {0}".format(args))
-            logging.debug(
-                "Operating System : {0} - {1} - {2}".format(platform.system(), platform.release(), platform.version()))
-            logging.debug("Python Version : {0} ({1})".format(platform.python_version(), platform.architecture()[0]))
+            logging.debug("Operating System : {0} - {1} - {2}"
+                          .format(platform.system(), platform.release(), platform.version()))
+            logging.debug("Python Version : {0} ({1})"
+                          .format(platform.python_version(), platform.architecture()[0]))
             logger = True
 
         if args.version:
@@ -138,18 +146,18 @@ class Main:
             print("Please enter the required argument. Run __main__.py --help")
             exit()
 
-        if type(args.episoderange) == list:
+        if isinstance(args.episoderange, list):
             if '-' in args.episoderange[0]:
                 args.episoderange = args.episoderange[0].split('-')
             else:
                 args.episoderange = args.episoderange[0]
-        if type(args.season) == list:
+        if isinstance(args.season, list):
             args.season = args.season[0]
-        if type(args.output) == list:
+        if isinstance(args.output, list):
             args.output = args.output[0]
-        if type(args.exclude) == list:
+        if isinstance(args.exclude, list):
             args.exclude = args.exclude[0].split(',')
-        if type(args.threads) ==list:
+        if isinstance(args.threads, list):
             args.threads = args.threads[0]
 
         Lifter(
