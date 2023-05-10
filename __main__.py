@@ -19,9 +19,8 @@ class Main:
 
         parser = argparse.ArgumentParser(description='wco-dl downloads shows from wcostream.net')
 
-        required_args = parser.add_argument_group('Required Arguments :')
-        required_args.add_argument('-i', '--input', nargs=1, help='Inputs the URL to show.')
-
+        parser.add_argument('-i', '--input', nargs=1,
+                            help='Inputs the URL to show.')
         parser.add_argument('-hd', '--highdef',
                             help='If you wish to get 720p', action="store_true")
         parser.add_argument('-epr', '--episoderange', nargs=1, default='All',
