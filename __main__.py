@@ -11,7 +11,7 @@ from Settings import Settings
 from DownloadsDatabase import DownloadsDatabase
 
 class Main:
-    """Main class of the wco-dl module"""
+    """Main class of the wco-dl package"""
 
     @staticmethod
     def arguments():
@@ -60,14 +60,16 @@ class Main:
             print('Newer version available, on https://github.com/EpicUnknown/wco-dl', end='\n\n')
 
 
-    if __name__ == '__main__':
+    @staticmethod
+    def main():
+        """Main entry point"""
         settings = Settings()
         database = DownloadsDatabase(settings)
 
         if settings.get_setting('checkForUpdates'):
-            check_for_new_version()
+            Main.check_for_new_version()
 
-        args = arguments()
+        args = Main.arguments()
 
         logger = args.verbose or False
         quiet = args.quiet or False
@@ -173,3 +175,7 @@ class Main:
             threads=args.threads,
             quiet=quiet
         )
+
+
+if __name__ == '__main__':
+    Main.main()
