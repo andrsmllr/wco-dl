@@ -155,9 +155,6 @@ class Main:
             print("No download URL specfied. Run __main__.py --help")
             exit()
 
-        if args.verbose:
-            print(f"Arguments = {args}")
-
         for url in urls:
             Lifter(
                 url=url,
