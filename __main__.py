@@ -69,6 +69,11 @@ class Main:
         """Main entry point"""
 
         args = Main.arguments()
+
+        if args.version:
+            print("Current Version : {0}".format(__version__))
+            exit()
+
         settings = Settings(args.settings)
         database = DownloadsDatabase(settings)
 
@@ -78,10 +83,6 @@ class Main:
         logger = args.verbose or False
         quiet = args.quiet or False
         urls = []
-
-        if args.version:
-            print("Current Version : {0}".format(__version__))
-            exit()
 
         if args.show_downloaded_animes:
             database.print_shows()
