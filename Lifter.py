@@ -241,8 +241,8 @@ class Lifter(object):
                     processes_extra = []
 
                     if (self.threads > len(matching)):
-                        print('Too many threads, setting threads to deafult amount.')
-                        self.threads = 3
+                        # Use as many threads as needed to download the remaining matches
+                        self.threads = len(matching)
 
                     procs = ProcessParallel(print('Threads started', end='\n\n'))
                     for x in range(self.threads):
