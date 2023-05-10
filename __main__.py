@@ -19,32 +19,34 @@ class Main:
 
         parser = argparse.ArgumentParser(description='wco-dl downloads shows from wcostream.net')
 
-        parser.add_argument('-i', '--input', nargs=1,
+        parser.add_argument('-i', '--input', nargs="*",
                             help='The URL of the show to download.')
+        parser.add_argument('-o', '--output',
+                            help='The directory to which downloaded files are saved.')
+        parser.add_argument('-b', '--batch', nargs="*",
+                            help='Get download URLs from batch file (one URL per line).')
         parser.add_argument('-s', '--settings', default="./settings.json", type=str,
                             help='Path to settings file.')
-        parser.add_argument('-hd', '--highdef',
-                            help='If you wish to get 720p', action="store_true")
-        parser.add_argument('-epr', '--episode-range', nargs=1, default='All',
-                            help='The episodes to download.')
-        parser.add_argument('-ser', '--season-range', nargs=1, default='All',
-                            help='The seasons to download.')
-        parser.add_argument('-x', '--exclude', nargs=1, default=None,
-                            help='The episodes to not download (e.g. OVA).')
-        parser.add_argument('-o', '--output', nargs=1,
-                            help='The directory to which downloaded files are saved.')
-        parser.add_argument('-v', "--verbose", action="store_true",
-                            help="Prints important debugging messages on screen.")
+        parser.add_argument('-eps', '--episodes', nargs=1, default='All',
+                            help='The episodes to download. Can be a range, for example -eps 1-4')
+        parser.add_argument('-ses', '--seasons', nargs=1, default='All',
+                            help='The seasons to download. Can be a range, for example -ses 1-4')
+        parser.add_argument('-xeps', '--exclude-episodes', nargs=1, default=None,
+                            help='The episodes to not download (e.g. OVA). Can be a range, for example -xeps 1-4')
+        #parser.add_argument('-xses', '--exclude-seasons', nargs="1", default=None,
+        #                    help='The episodes to not download (e.g. OVA). Can be a range, for example -xsps 1-4')
         parser.add_argument('-n', '--newest', action='store_true',
                             help='Get the newest episode in the series.')
         parser.add_argument('-sh', '--show_downloaded_animes', action='store_true',
                             help='Show all downloaded shows and episodes')
         parser.add_argument('-us', '--update_shows', action='store_true',
                             help='Update all shows in your database that have new episodes.')
-        parser.add_argument('-b', '--batch', nargs=1,
-                            help='Get download URLs from batch file (one URL per line).')
-        parser.add_argument('-t', '--threads', nargs=1, default=None,
-                            help='Create threads to run multiple downloads in parallel.')
+        parser.add_argument('-hd', '--highdef',
+                            help='If you wish to get 720p', action="store_true")
+        parser.add_argument('-t', '--num-threads', default=1, type=int,
+                            help='Create this many threads to run multiple downloads in parallel.')
+        parser.add_argument('-v', "--verbose", action="store_true",
+                            help="Prints important debugging messages on screen.")
         parser.add_argument('-q', "--quiet", action="store_true",
                             help="Do not show download progress.")
         parser.add_argument('--version', action='store_true',
@@ -75,6 +77,7 @@ class Main:
 
         logger = args.verbose or False
         quiet = args.quiet or False
+        urls = []
 
         if args.version:
             print("Current Version : {0}".format(__version__))
@@ -99,42 +102,17 @@ class Main:
         else:
             args.highdef = '480'
 
-        if args.batch:
-            if isinstance(args.threads, list):
-                args.threads = args.threads[0]
-
-            with open(args.batch[0], 'r') as anime_list:
-                for anime in anime_list:
-                    anime = anime.strip(" \n")
-                    anime = anime.replace('https://wcostream.net', 'https://www.wcostream.net')
-                    Lifter(
-                        url=anime,
-                        resolution=args.highdef,
-                        logger=logger,
-                        season=args.season_range,
-                        ep_range=args.episode_range,
-                        exclude=args.exclude,
-                        output=args.output,
-                        newest=args.newest,
-                        settings=settings,
-                        database=database,
-                        threads=args.threads,
-                        quiet=quiet
-                    )
-
-            print('Done')
-            exit()
-
         if args.update_shows:
-            print("Updating all shows, this will take a while.")
-            for url in database.iterate_urls():
+            print("Updating all shows in database, this may take a while.")
+            urls = list(database.iterate_urls())
+            for url in urls:
                 Lifter(
                     url=url,
                     resolution=args.highdef,
                     logger=logger,
-                    season=args.season,
-                    ep_range=args.episoderange,
-                    exclude=args.exclude,
+                    season=args.seasons,
+                    ep_range=args.episodes,
+                    exclude=args.exclude_episodes,
                     output=args.output,
                     newest=args.newest,
                     settings=settings,
@@ -142,41 +120,59 @@ class Main:
                     update=True,
                     quiet=quiet
                 )
-            print('Done')
-            exit()
+            print('Done updating shows in data')
+            # Clear the urls list, in the next step normal downloads are processed
+            urls = []
 
-        if args.input is None:
-            print("Please enter the required argument. Run __main__.py --help")
-            exit()
+        for batch_file in args.batch or []:
+            with open(batch_file, 'r') as batch_urls:
+                for url in batch_urls:
+                    url = url.strip(" \n")
+                    url = url.replace('https://wcostream.net', 'https://www.wcostream.net')
+                    urls.append(url)
 
-        if isinstance(args.episoderange, list):
-            if '-' in args.episoderange[0]:
-                args.episoderange = args.episoderange[0].split('-')
+        for url in args.input or []:
+            url = url.strip(" \n")
+            url = url.replace('https://wcostream.net', 'https://www.wcostream.net')
+            urls.append(url)
+
+        # Ensure each url is only listed once
+        urls = list(set(urls))
+
+        if isinstance(args.episodes, list):
+            if '-' in args.episodes[0]:
+                args.episodes = args.episodes[0].split('-')
             else:
-                args.episoderange = args.episoderange[0]
-        if isinstance(args.season, list):
-            args.season = args.season[0]
-        if isinstance(args.output, list):
-            args.output = args.output[0]
-        if isinstance(args.exclude, list):
-            args.exclude = args.exclude[0].split(',')
-        if isinstance(args.threads, list):
-            args.threads = args.threads[0]
+                args.episodes = args.episodes[0]
 
-        Lifter(
-            url=args.input[0].replace('https://wcostream.net', 'https://www.wcostream.net'),
-            resolution=args.highdef,
-            logger=logger,
-            season=args.season_range,
-            ep_range=args.episode_range,
-            exclude=args.exclude,
-            output=args.output,
-            newest=args.newest,
-            settings=settings,
-            database=database,
-            threads=args.threads,
-            quiet=quiet
-        )
+        if isinstance(args.seasons, list):
+            args.seasons = args.seasons[0]
+
+        if isinstance(args.exclude_episodes, list):
+            args.exclude_episodes = args.exclude_episodes[0].split(',')
+
+        if len(urls) == 0:
+            print("No download URL specfied. Run __main__.py --help")
+            exit()
+
+        if args.verbose:
+            print(f"Arguments = {args}")
+
+        for url in urls:
+            Lifter(
+                url=url,
+                resolution=args.highdef,
+                logger=logger,
+                season=args.seasons,
+                ep_range=args.episodes,
+                exclude=args.exclude_episodes,
+                output=args.output,
+                newest=args.newest,
+                settings=settings,
+                database=database,
+                threads=args.num_threads,
+                quiet=quiet
+            )
 
 
 if __name__ == '__main__':
