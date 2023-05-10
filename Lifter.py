@@ -8,7 +8,7 @@ import urllib3
 from urllib3.exceptions import ResponseError
 from bs4 import BeautifulSoup
 from Downloader import Downloader
-from Process import ProcessParallel
+from concurrent.futures import ThreadPoolExecutor, wait
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -202,79 +202,7 @@ class Lifter(object):
         else:
             matching = links
 
-        if len(matching) < 1:
-            matching.reverse()
-        if (self.threads > 1):
-            if (len(matching) == 1):
-                for item in matching:
-                    source_url, backup_url = self.find_download_link(item)
-                    hidden_url = self.find_hidden_url(item)
-                    if self.resolution == '480' or len(source_url[0]) > 2:
-                        download_url = source_url[0][1]
-                    else:
-                        try:
-                            download_url = source_url[1][1]
-                        except Exception:
-                            download_url = source_url[0][1]
-                    show_info = self.info_extractor(item)
-                    output = self.check_output(show_info[0])
-
-                    Downloader(
-                        logger=self.logger,
-                        download_url=download_url,
-                        backup_url=backup_url,
-                        hidden_url=hidden_url,
-                        output=output,
-                        header=self.header,
-                        user_agent=self.user_agent,
-                        show_info=show_info,
-                        settings=self.settings,
-                        quiet=self.quiet
-                    ).start_download()
-            else:
-                count = 0
-                while (True):
-                    processes_count = 0
-                    processes = []
-                    processes_url = []
-                    processes_extra = []
-
-                    if (self.threads > len(matching)):
-                        # Use as many threads as needed to download the remaining matches
-                        self.threads = len(matching)
-
-                    procs = ProcessParallel(print('Threads started', end='\n\n'))
-                    for x in range(self.threads):
-                        try:
-                            item = matching[count]
-                            _, extra = self.is_valid(item)
-                            processes.append(self.download_single)
-                            processes_url.append(item)
-                            processes_extra.append(extra)
-                            count += 1
-                        except Exception as e:
-                            if self.logger:
-                                print('Error: {0}'.format(e))
-                            pass
-                    for x in processes:
-                        procs.append_process(x, url=processes_url[processes_count], extra=processes_extra[processes_count])
-                        processes_count+=1
-
-                    if ('' in processes_extra):
-                        self.threads = None
-                        self.download_show(url)
-                        break
-
-                    procs.fork_processes()
-                    procs.start_all()
-                    procs.join_all()
-                    processes_url.clear()
-                    processes_extra.clear()
-                    processes.clear()
-                    self.threads = self.original_thread
-                    if (count >= len(matching)):
-                        break
-        else:
+        if (len(matching) == 1 or self.threads < 2):
             for item in matching:
                 source_url, backup_url = self.find_download_link(item)
                 hidden_url = self.find_hidden_url(item)
@@ -300,9 +228,24 @@ class Lifter(object):
                     settings=self.settings,
                     quiet=self.quiet
                 ).start_download()
+        else:
+            params = []
+            for _url in matching:
+                try:
+                    _, extra = self.is_valid(_url)
+                    params.append((_url, extra))
+                except Exception as error:
+                    if self.logger:
+                        print(f"Error: {error}")
 
-            if (self.original_thread != None and self.original_thread != 0):
-                self.threads = self.original_thread
+            with ThreadPoolExecutor(max_workers=self.threads) as executor:
+                future_results = [executor.submit(self.download_single, _url, extra) for (_url, extra) in params]
+
+            completed, uncompleted = wait(future_results)
+            print(f"Downloads completed: {len(completed)}, downloads uncompleted or failed: {len(uncompleted)}")
+
+            return
+
 
     @staticmethod
     def info_extractor(url):
