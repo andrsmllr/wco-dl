@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 
+import base64
 import os
 import re
-import base64
+
+from concurrent.futures import ThreadPoolExecutor, wait
+from bs4 import BeautifulSoup
 import requests
 import urllib3
 from urllib3.exceptions import ResponseError
-from bs4 import BeautifulSoup
+
 from Downloader import Downloader
-from concurrent.futures import ThreadPoolExecutor, wait
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 

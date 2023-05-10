@@ -2,6 +2,7 @@
 
 import os
 import re
+
 from cfscrape import create_scraper
 from requests import session
 from tqdm import tqdm

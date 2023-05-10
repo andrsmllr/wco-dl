@@ -1,9 +1,13 @@
+# -*- coding: utf-8 -*-
+
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
-from Settings import Settings
 import os
+
+from Settings import Settings
+
 
 class DownloadsDatabase:
     """Object that holds information about completed downloads"""
