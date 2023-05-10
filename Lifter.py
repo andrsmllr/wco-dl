@@ -17,7 +17,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 class Lifter(object):
     """Object that grabs URLs and initiates downloads"""
 
-    def __init__(self, url, resolution, logger, season, ep_range, exclude, output, newest, settings, database, quiet,update=False, threads=None):
+    def __init__(self, url, resolution, logger, season, ep_range, exclude, output, newest, settings, database, quiet,update=False, threads=1):
         # Define our variables
         self.url = url
         self.resolution = resolution
@@ -205,7 +205,7 @@ class Lifter(object):
 
         if len(matching) < 1:
             matching.reverse()
-        if (self.threads != None and self.threads != 0):
+        if (self.threads > 1):
             if (len(matching) == 1):
                 for item in matching:
                     source_url, backup_url = self.find_download_link(item)
@@ -240,12 +240,12 @@ class Lifter(object):
                     processes_url = []
                     processes_extra = []
 
-                    if (int(self.threads) > len(matching)):
-                        print('To many threads, setting threads to deafult amount.')
+                    if (self.threads > len(matching)):
+                        print('Too many threads, setting threads to deafult amount.')
                         self.threads = 3
 
                     procs = ProcessParallel(print('Threads started', end='\n\n'))
-                    for x in range(int(self.threads)):
+                    for x in range(self.threads):
                         try:
                             item = matching[count]
                             _, extra = self.is_valid(item)
