@@ -20,33 +20,35 @@ class Main:
         parser = argparse.ArgumentParser(description='wco-dl downloads shows from wcostream.net')
 
         parser.add_argument('-i', '--input', nargs=1,
-                            help='Inputs the URL to show.')
+                            help='The URL of the show to download.')
+        parser.add_argument('-s', '--settings', nargs=1, default="./settings.json",
+                            help='Path to settings file.')
         parser.add_argument('-hd', '--highdef',
                             help='If you wish to get 720p', action="store_true")
-        parser.add_argument('-epr', '--episoderange', nargs=1, default='All',
-                            help='Specifies the range of episodes to download.')
-        parser.add_argument('-se', '--season', nargs=1, default='All',
-                            help='Specifies the season to download.')
+        parser.add_argument('-epr', '--episode-range', nargs=1, default='All',
+                            help='The episodes to download.')
+        parser.add_argument('-ser', '--season-range', nargs=1, default='All',
+                            help='The seasons to download.')
         parser.add_argument('-x', '--exclude', nargs=1, default=None,
-                            help='Specifies the episodes to not download (ie ova).')
+                            help='The episodes to not download (e.g. OVA).')
         parser.add_argument('-o', '--output', nargs=1,
-                            help='Specifies the directory of which to save the files.')
+                            help='The directory to which downloaded files are saved.')
         parser.add_argument('-v', "--verbose", action="store_true",
                             help="Prints important debugging messages on screen.")
         parser.add_argument('-n', '--newest', action='store_true',
                             help='Get the newest episode in the series.')
         parser.add_argument('-sh', '--show_downloaded_animes', action='store_true',
-                            help='This will show all downloaded shows and episodes')
+                            help='Show all downloaded shows and episodes')
         parser.add_argument('-us', '--update_shows', action='store_true',
-                            help='This will update all shows in your database that have new episodes.')
+                            help='Update all shows in your database that have new episodes.')
         parser.add_argument('-b', '--batch', nargs=1,
-                            help='Batch download, download multiple anime.')
+                            help='Get download URLs from batch file (one URL per line).')
         parser.add_argument('-t', '--threads', nargs=1, default=None,
-                            help='This will create multiple threads, in other words download multiple episodes at ones.')
+                            help='Create threads to run multiple downloads in parallel.')
         parser.add_argument('-q', "--quiet", action="store_true",
-                            help="Will not show download progress")
+                            help="Do not show download progress.")
         parser.add_argument('--version', action='store_true',
-                            help='Shows version and exits.')
+                            help='Print version and exit.')
 
         return parser.parse_args()
 
@@ -63,13 +65,13 @@ class Main:
     @staticmethod
     def main():
         """Main entry point"""
-        settings = Settings()
+
+        args = Main.arguments()
+        settings = Settings(args.settings)
         database = DownloadsDatabase(settings)
 
         if settings.get_setting('checkForUpdates'):
             Main.check_for_new_version()
-
-        args = Main.arguments()
 
         logger = args.verbose or False
         quiet = args.quiet or False
@@ -86,8 +88,8 @@ class Main:
                         url=anime,
                         resolution=args.highdef,
                         logger=logger,
-                        season=args.season,
-                        ep_range=args.episoderange,
+                        season=args.season_range,
+                        ep_range=args.episode_range,
                         exclude=args.exclude,
                         output=args.output,
                         newest=args.newest,
@@ -165,8 +167,8 @@ class Main:
             url=args.input[0].replace('https://wcostream.net', 'https://www.wcostream.net'),
             resolution=args.highdef,
             logger=logger,
-            season=args.season,
-            ep_range=args.episoderange,
+            season=args.season_range,
+            ep_range=args.episode_range,
             exclude=args.exclude,
             output=args.output,
             newest=args.newest,
