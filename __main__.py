@@ -131,6 +131,9 @@ class Main:
             with open(batch_file, 'r') as batch_urls:
                 for url in batch_urls:
                     url = url.strip(" \n")
+                    # Skip empty lines
+                    if len(url) < 1:
+                        continue
                     # Skip commented lines
                     if url[0] == "#":
                         continue
