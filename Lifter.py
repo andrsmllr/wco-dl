@@ -64,9 +64,8 @@ class Lifter(object):
                 print('Downloading single')
                 self.download_single(url, extra)
         else:
-            # Not a valid wcostream link
-            print(extra)
-            exit()
+            print(f"Not a valid wcostream url: {extra}")
+            return
 
     def check_output(self, anime_name):
         output_directory = os.path.abspath("Output" + os.sep + str(anime_name) + os.sep)
