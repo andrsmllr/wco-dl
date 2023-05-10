@@ -21,7 +21,7 @@ class Main:
 
         parser.add_argument('-i', '--input', nargs=1,
                             help='The URL of the show to download.')
-        parser.add_argument('-s', '--settings', nargs=1, default="./settings.json",
+        parser.add_argument('-s', '--settings', default="./settings.json", type=str,
                             help='Path to settings file.')
         parser.add_argument('-hd', '--highdef',
                             help='If you wish to get 720p', action="store_true")
@@ -76,6 +76,29 @@ class Main:
         logger = args.verbose or False
         quiet = args.quiet or False
 
+        if args.version:
+            print("Current Version : {0}".format(__version__))
+            exit()
+
+        if args.show_downloaded_animes:
+            database.print_shows()
+            exit()
+
+        if args.verbose:
+            logging.basicConfig(format='%(levelname)s: %(message)s', filename="Error Log.log", level=logging.DEBUG)
+            logging.debug('You have successfully set the Debugging On.')
+            logging.debug("Arguments Provided : {0}".format(args))
+            logging.debug("Operating System : {0} - {1} - {2}"
+                          .format(platform.system(), platform.release(), platform.version()))
+            logging.debug("Python Version : {0} ({1})"
+                          .format(platform.python_version(), platform.architecture()[0]))
+            logger = True
+
+        if args.highdef:
+            args.highdef = '720'
+        else:
+            args.highdef = '480'
+
         if args.batch:
             if isinstance(args.threads, list):
                 args.threads = args.threads[0]
@@ -121,29 +144,6 @@ class Main:
                 )
             print('Done')
             exit()
-
-        if args.show_downloaded_animes:
-            database.print_shows()
-            exit()
-
-        if args.verbose:
-            logging.basicConfig(format='%(levelname)s: %(message)s', filename="Error Log.log", level=logging.DEBUG)
-            logging.debug('You have successfully set the Debugging On.')
-            logging.debug("Arguments Provided : {0}".format(args))
-            logging.debug("Operating System : {0} - {1} - {2}"
-                          .format(platform.system(), platform.release(), platform.version()))
-            logging.debug("Python Version : {0} ({1})"
-                          .format(platform.python_version(), platform.architecture()[0]))
-            logger = True
-
-        if args.version:
-            print("Current Version : {0}".format(__version__))
-            exit()
-
-        if args.highdef:
-            args.highdef = '720'
-        else:
-            args.highdef = '480'
 
         if args.input is None:
             print("Please enter the required argument. Run __main__.py --help")
