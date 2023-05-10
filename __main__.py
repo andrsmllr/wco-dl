@@ -5,10 +5,12 @@ import argparse
 import logging
 import platform
 import requests
-from Lifter import Lifter
+
 from version import __version__
-from Settings import Settings
 from DownloadsDatabase import DownloadsDatabase
+from Lifter import Lifter
+from Settings import Settings
+
 
 class Main:
     """Main class of the wco-dl package"""
@@ -129,6 +131,9 @@ class Main:
             with open(batch_file, 'r') as batch_urls:
                 for url in batch_urls:
                     url = url.strip(" \n")
+                    # Skip commented lines
+                    if url[0] == "#":
+                        continue
                     url = url.replace('https://wcostream.net', 'https://www.wcostream.net')
                     urls.append(url)
 
@@ -137,8 +142,9 @@ class Main:
             url = url.replace('https://wcostream.net', 'https://www.wcostream.net')
             urls.append(url)
 
-        # Ensure each url is only listed once
-        urls = list(set(urls))
+        # Ensure each url is in the list only once
+        # Using dict.fromkeys() ensures that the order of elements in the list is not changed
+        urls = list(dict.fromkeys(urls))
 
         if isinstance(args.episodes, list):
             if '-' in args.episodes[0]:
