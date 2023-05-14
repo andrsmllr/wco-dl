@@ -21,7 +21,7 @@ class Downloader(object):
         if show_info[2] == "":
             self.episode = '{0}'.format(re.search(r'(\d+)', show_info[3]).group(1))
         else:
-            self.episode = '{0}'.format(re.search(r'(\d+)', show_info[2]).group(1))s
+            self.episode = '{0}'.format(re.search(r'(\d+)', show_info[2]).group(1))
         self.episode = self.episode.strip('0');
         self.episode = self.episode.zfill(self.settings.get_setting('episodePadding'))
 
