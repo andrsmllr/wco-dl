@@ -106,7 +106,7 @@ class Lifter(object):
         page = self.request_c(url)
         soup = BeautifulSoup(page.text, 'html.parser')
 
-        iframe_encoded = repr(soup.find("meta", {"itemprop": "embedURL"}).next_element.next_element)
+        iframe_encoded = repr(soup.find("meta", {"itemprop": "embedURL"}).previous_element)
         tag = re.search("^<([a-zA-Z]*)", iframe_encoded).group(1)
         if tag == 'script':
             iframe_decoded = self._decode_iframe(iframe_encoded)
@@ -138,7 +138,7 @@ class Lifter(object):
             except Exception:
                 download_url = download_url[0][1]
         show_info = self.info_extractor(extra)
-        output = self.check_output(show_info[0])
+        output = self.check_output(show_info[0].split("/")[-1]
 
         Downloader(
             logger=self.logger,
@@ -251,7 +251,7 @@ class Lifter(object):
 
     @staticmethod
     def info_extractor(url):
-        url = re.sub('https://www.wcostream.[net|org]/', '', url)
+        url = re.sub('https://www.wcostream.[a-zA-Z]+/', '', url)
         try:
             if "season" in url:
                 show_name, season, episode, desc = re.findall(r'([a-zA-Z0-9].+)\s(season\s\d+\s?)(episode\s\d+\s)?(.+)',
@@ -268,7 +268,7 @@ class Lifter(object):
         return show_name.title().strip(), season.title().strip(), episode.title().strip(), desc.title().strip(), url
 
     def is_valid(self, url):
-        website = re.findall('https://(www.)?wcostream.(net|org)/(anime/)?([a-zA-Z].+$)?', url)
+        website = re.findall('https://(www.)?wcostream.([a-zA-Z]+)/(anime/)?([a-zA-Z].+$)?', url)
         if website:
             if website[0][2] == "anime/":
                 return True, (website[0][2], website[0][3])
