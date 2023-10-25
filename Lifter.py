@@ -138,7 +138,7 @@ class Lifter(object):
             except Exception:
                 download_url = download_url[0][1]
         show_info = self.info_extractor(extra)
-        output = self.check_output(show_info[0].split("/")[-1]
+        output = self.check_output(show_info[0].split("/")[-1])
 
         Downloader(
             logger=self.logger,
