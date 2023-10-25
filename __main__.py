@@ -19,7 +19,7 @@ class Main:
     def arguments():
         """Function that parses command line arguments"""
 
-        parser = argparse.ArgumentParser(description='wco-dl downloads shows from wcostream.net')
+        parser = argparse.ArgumentParser(description='wco-dl downloads shows from wcostream.net|org|tv')
 
         parser.add_argument('-i', '--input', nargs="*",
                             help='The URL of the show to download.')
@@ -137,12 +137,12 @@ class Main:
                     # Skip commented lines
                     if url[0] == "#":
                         continue
-                    url = url.replace('https://wcostream.net', 'https://www.wcostream.net')
+                    url = url.replace('https://wcostream', 'https://www.wcostream')
                     urls.append(url)
 
         for url in args.input or []:
             url = url.strip(" \n")
-            url = url.replace('https://wcostream.net', 'https://www.wcostream.net')
+            url = url.replace('https://wcostream', 'https://www.wcostream')
             urls.append(url)
 
         # Ensure each url is in the list only once
