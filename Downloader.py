@@ -16,13 +16,13 @@ class Downloader(object):
         self.sess = create_scraper(self.sess)
         self.show_name = show_info[0].split("/")[-1]
         self.season = re.search(r'(\d+)', show_info[1]).group(1)
-        self.season = self.season.strip('0');
+        self.season = self.season.lstrip('0');
         self.season = self.season.zfill(self.settings.get_setting('seasonPadding'))
         if show_info[2] == "":
             self.episode = '{0}'.format(re.search(r'(\d+)', show_info[3]).group(1))
         else:
             self.episode = '{0}'.format(re.search(r'(\d+)', show_info[2]).group(1))
-        self.episode = self.episode.strip('0');
+        self.episode = self.episode.lstrip('0');
         self.episode = self.episode.zfill(self.settings.get_setting('episodePadding'))
 
         self.desc = show_info[3].split("/")[-1]
