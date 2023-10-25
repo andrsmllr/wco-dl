@@ -14,7 +14,7 @@ class Downloader(object):
         self.settings = settings
         self.sess = session()
         self.sess = create_scraper(self.sess)
-        self.show_name = show_info[0]
+        self.show_name = show_info[0].split("/")[-1]
         self.season = re.search(r'(\d+)', show_info[1]).group(1)
         self.season = self.season.strip('0');
         self.season = self.season.zfill(self.settings.get_setting('seasonPadding'))
@@ -25,13 +25,13 @@ class Downloader(object):
         self.episode = self.episode.strip('0');
         self.episode = self.episode.zfill(self.settings.get_setting('episodePadding'))
 
-        self.desc = show_info[3]
+        self.desc = show_info[3].split("/")[-1]
         self.show_url = show_info[4]
         self.header = header
         self.output = output
-        self.download_url = download_url
-        self.backup_url = backup_url
-        self.hidden_url = hidden_url
+        self.download_url = download_url.lower()
+        self.backup_url = backup_url.lower()
+        self.hidden_url = hidden_url.lower()
         self.user_agent = user_agent
         self.logger = logger
         self.quiet = quiet
@@ -133,7 +133,7 @@ class Downloader(object):
                     'Accept': 'video/webm,video/ogg,video/*;q=0.9,application/ogg;q=0.7,audio/*;q=0.6,*/*;q=0.5',
                     'Accept-Language': 'en-US,en;q=0.5',
                     'Connection': 'keep-alive',
-                    'Referer': self.hidden_url.replace('https://wcostream.net', 'https://www.wcostream.net'),
+                    'Referer': self.hidden_url.lower().replace('https://wcostream', 'https://www.wcostream'),
                     'Range': 'bytes={0}-'.format(resume_bytes),
                 }
                 dlr = self.sess.get(host_url, stream=True, headers=resume_header)
